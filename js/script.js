@@ -123,7 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             else if (targetPageId === 'products') {
             setTimeout(initializeProductsAnimation, 100);
-        }
+            }
+            else if (targetPageId === 'sustainability') { setTimeout(initializeSustainabilityAnimation, 100); }
+            else if (targetPageId === 'milestone') { setTimeout(initializeMilestoneAnimation, 100); }
+
         }
         
         // Update active nav link
@@ -145,6 +148,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     navLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const target = link.dataset.target; if (!link.classList.contains('nav-link-trigger')) { showPage(target); closeSidebar(); } }); });
     
+    function initializeMilestoneAnimation() {
+        if (typeof gsap === 'undefined') { return; }
+
+        let headerST = gsap.from('#milestone-page .milestone-header > *', {
+            autoAlpha: 0,
+            y: 40,
+            stagger: 0.2,
+            duration: 1,
+            ease: 'power2.out'
+        });
+        pageAnimations.push(headerST);
+
+        gsap.utils.toArray('.milestone-item').forEach((item, index) => {
+            const image = item.querySelector('.milestone-image');
+            const content = item.querySelectorAll('.milestone-content > *');
+
+            // Determine animation direction based on whether the item is odd or even
+            const imageX = (index % 2 === 0) ? -50 : 50;
+
+            let itemTimeline = gsap.timeline({
+                scrollTrigger: {
+                    trigger: item,
+                    start: 'top 85%',
+                }
+            });
+
+            itemTimeline.from(image, { autoAlpha: 0, x: imageX, duration: 1, ease: 'power2.out' })
+                       .from(content, { autoAlpha: 0, y: 30, stagger: 0.15, duration: 0.8, ease: 'power2.out' }, '-=0.7');
+            
+            pageAnimations.push(itemTimeline.scrollTrigger);
+        });
+    }
     function initializeProductsAnimation() {
     if (typeof gsap === 'undefined') { console.error('GSAP not loaded.'); return; }
     
@@ -289,5 +324,19 @@ document.addEventListener('DOMContentLoaded', () => {
             ease: 'power2.out'
         });
         wwdAnimations.push(cardsST.scrollTrigger);
+    }
+
+     // --- SUSTAINABILITY PAGE ANIMATIONS ---
+    function initializeSustainabilityAnimation() {
+        if (typeof gsap === 'undefined') { return; }
+
+        let heroST = gsap.from('#sustainability-page .wwd-hero-content > *', { autoAlpha: 0, y: 40, stagger: 0.2, duration: 1, ease: 'power2.out' });
+        pageAnimations.push(heroST);
+
+        let introST = gsap.from('#sustainability-page .wwd-intro p', { scrollTrigger: { trigger: '#sustainability-page .wwd-intro', start: 'top 80%' }, autoAlpha: 0, y: 40, stagger: 0.2, duration: 1, ease: 'power2.out' });
+        pageAnimations.push(introST.scrollTrigger);
+
+        let cardsST = gsap.from('#sustainability-page .wwd-card', { scrollTrigger: { trigger: '#sustainability-page .sus-cards-grid', start: 'top 80%' }, autoAlpha: 0, y: 50, duration: 0.8, stagger: 0.2, ease: 'power2.out' });
+        pageAnimations.push(cardsST.scrollTrigger);
     }
 });
